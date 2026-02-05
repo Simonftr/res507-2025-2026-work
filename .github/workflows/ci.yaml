@@ -34,8 +34,10 @@ jobs:
         working-directory: labs/40-containerized-node-app
         run: |
           docker run -d --name quote-app -p 3000:3000 quote-app
-          for i in $(seq 1 30); do
-            if curl -fsS http://localhost:3000/health >/dev/null; then
+          for i in $(seq 1 15); do
+            response=$(curl -fsS http://localhost:3000/health)
+            ech $response
+            if echo $response | grep -q "ok"; then
               echo "Health check passed"
               exit 0
             fi
@@ -43,6 +45,7 @@ jobs:
           done
           echo "Health check failed"
           docker logs quote-app || true
+          docker ps 
           exit 1
 
       - name: Stop container
