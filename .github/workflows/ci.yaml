@@ -35,7 +35,7 @@ jobs:
         run: |
           docker run -d --name quote-app -p 3000:3000 quote-app
           for i in $(seq 1 15); do
-            response=$(curl -fsS http://localhost:3000/health)
+            response=$(curl -fsS http://localhost:3000/health || true)
             if echo "$response" | grep -q true; then
               echo "Health check passed"
               exit 0
@@ -44,7 +44,7 @@ jobs:
           done
           echo "Health check failed"
           docker logs quote-app || true
-          docker ps 
+          docker ps -a
           exit 1
 
       - name: Stop container
