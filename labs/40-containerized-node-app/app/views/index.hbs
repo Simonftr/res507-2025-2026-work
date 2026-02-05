@@ -6,31 +6,119 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>QuoteBoard</title>
   <style>
-    body {
-      font-family: system-ui, sans-serif;
-      max-width: 700px;
-      margin: 2rem auto;
-      padding: 0 1rem;
-      background: #111;
-      color: #eee;
+    :root {
+      --bg: #0f0f0f;
+      --card: #1a1a1a;
+      --accent: #7c7cff;
+      --text: #eaeaea;
+      --muted: #aaa;
+      --border: #2a2a2a;
     }
 
-    form {
-      display: grid;
-      gap: .5rem;
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      max-width: 720px;
+      margin: 3rem auto;
+      padding: 0 1rem;
+      background: linear-gradient(180deg, #0d0d0d, #141414);
+      color: var(--text);
+    }
+
+    /* Title */
+    h1 {
+      text-align: center;
       margin-bottom: 2rem;
+      letter-spacing: 0.5px;
+    }
+
+    /* Form */
+    form {
+      background: var(--card);
+      padding: 1.25rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      display: grid;
+      gap: 0.75rem;
+      margin-bottom: 2.5rem;
     }
 
     input,
-    textarea,
-    button {
+    textarea {
+      background: #111;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 0.7rem;
       font: inherit;
-      margin-top: 0.5rem;
+      resize: vertical;
     }
 
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--muted);
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent);
+    }
+
+    /* Button */
+    button {
+      margin-top: 0.5rem;
+      align-self: flex-end;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 0.5rem 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.1s ease, opacity 0.1s ease;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    /* Quotes */
     .quote {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
       margin-bottom: 1rem;
     }
+
+    .quote > div:first-child {
+      font-size: 1.05rem;
+      line-height: 1.5;
+    }
+
+    .quote > div:last-child {
+      margin-top: 0.5rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: right;
+      font-style: italic;
+    }
+
+    /* Empty state */
+    p {
+      text-align: center;
+      color: var(--muted);
+    }
+
   </style>
 </head>
 
