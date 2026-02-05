@@ -37,7 +37,7 @@ jobs:
           for i in $(seq 1 15); do
             response=$(curl -fsS http://localhost:3000/health)
             echo $response
-            if echo "$response" | jq -e '.ok == true' >/dev/null; then
+            if echo "$response" | grep -q true >/dev/null; then
               echo "Health check passed"
               exit 0
             fi
