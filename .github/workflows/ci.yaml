@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: labs/res
+        working-directory: labs/40-containerized-node-app
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
