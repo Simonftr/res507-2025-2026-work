@@ -40,3 +40,10 @@ A common modern architecture is:
 Cloud Infrastructure → Virtual Machines → Kubernetes → Containers
 
 This provides both strong isolation and operational efficiency.
+
+
+## Step 5
+
+When a pod is deleted or crashes, the Deployment recreates it because it ensures that the number of running pods matches the number of replicas defined in the YAML file.
+
+If no nodes are available with enough resources, the pods remain in the "Pending" state. Kubernetes cannot schedule them until a healthy node with sufficient CPU and memory becomes available. If all nodes are down and no resources exist, the pods cannot run and the application becomes unavailable. In cloud environments with autoscaling, new nodes can be created automatically to accommodate pending pods.
