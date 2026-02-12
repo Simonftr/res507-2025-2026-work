@@ -10,7 +10,7 @@ export async function buildApp() {
 
   // Register plugins
   await app.register(postgres, {
-    connectionString: process.env.DATABASE_URL ?? 'postgres://postgres@localhost/postgres'
+    connectionString: 'postgres://postgres:postgres@postgres-service:5432/postgres'
   })
   await app.register(formbody);
   await app.register(view, {
@@ -28,7 +28,7 @@ export async function buildApp() {
     const quotes = result.rows;
 
     // Placeholder test quotes
-    // const quotes = [{text: "quote 1", author: "author 1"}, {text: "quote 2", author: "author 2"}]; 
+    //const quotes = [{text: "quote 1", author: "author 1"}, {text: "quote 2", author: "author 2"}]; 
     return reply.view("index.hbs", { quotes });
   });
 
