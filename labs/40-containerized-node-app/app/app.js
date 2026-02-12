@@ -10,7 +10,7 @@ export async function buildApp() {
 
   // Register plugins
   await app.register(postgres, {
-    connectionString: 'postgres://postgres:postgres@postgres-service:5432/postgres'
+    connectionString: `postgres://${process.env.POSTGRES_USER}:${process.env.POSTGRES_PASSWORD}@postgres-service:5432/postgres`
   })
   await app.register(formbody);
   await app.register(view, {
