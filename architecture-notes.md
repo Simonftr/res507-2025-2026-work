@@ -174,3 +174,86 @@ This section describes a production-ready architecture for a Kubernetes-based qu
 - By default, Kubernetes Secrets are **base64-encoded**, not encrypted.
 - They are stored in **etcd**, the cluster’s data store.
 - You can enable **encryption at rest** in etcd for stronger security, which is recommended for production clusters.
+
+
+### **Observe rollout progress**
+
+- **What changed in the cluster during the rollout?**
+
+  During the rollout, Kubernetes attempted to update the deployment by pulling the `quote-app:v3` image for the new version of the pod. However, the image could not be pulled successfully, and the pod remained in the "Pending" state because Kubernetes could not access the specified image from the registry.
+
+- **What stayed the same?**
+
+  The overall structure of the deployment remained the same. The same pod configuration, resource limits, and environment variables were kept. The pod was still scheduled on the same node, but the image update failed, so the new version was not deployed.
+
+- **How did Kubernetes decide when to create and delete Pods?**
+
+  Kubernetes attempted to create the new pod using the `quote-app:v3` image, but the image pull failed, so it didn't proceed to delete any old pods. As the new pod was still in the "Pending" state and could not start, no new pods were successfully created.
+
+---
+
+### **Require one broken rollout**
+
+- **What failed first?**
+
+  The failure occurred when Kubernetes could not pull the specified image (`quote-app:v3`). The error `failed to resolve reference "docker.io/library/quote-app:v3": pull access denied, repository does not exist or may require authorization` indicated that either the image did not exist or there was an authorization issue when trying to pull it.
+
+- **Which signal showed you the failure fastest?**
+
+  The signal showing the failure fastest was the event message: `Failed to pull image "quote-app:v3": failed to resolve reference "docker.io/library/quote-app:v3": pull access denied, repository does not exist or may require authorization`. This error was shown in the events section of the pod's description, specifically under `Warning Failed` and `Error: ErrImagePull`.
+
+- **What would you check next if this happened in production?**
+
+  If this happened in a production environment, the first thing to check would be whether the image `quote-app:v3` exists in the registry and if there are any issues with permissions or authentication. You would also verify if the image is publicly accessible or if credentials are needed to pull it. If authentication is required, ensure the appropriate Kubernetes secrets or credentials are configured.
+
+---
+
+### **Roll back safely**
+
+- **What did rollback change?**
+
+  The rollback would restore the deployment to the previous image version (likely `quote-app:v2` or whatever was last successfully deployed). This would resolve the issue by using an image that exists and is accessible, ensuring the application becomes healthy again.
+
+- **What did rollback not change?**
+
+  The rollback would not change the configuration of the pods, such as environment variables or resource limits. Only the application version (the Docker image) would be reverted.
+
+
+---
+
+## Required Extension Choice
+
+### Option A: Explicit Rollout Strategy
+
+We updated the Deployment to explicitly define a rolling update strategy:
+
+```yaml
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 1
+    maxUnavailable: 0
+```
+
+- **What does `maxSurge` do?**
+
+  `maxSurge` defines how many additional Pods Kubernetes can create above the desired number of replicas during a rollout.
+
+  With `maxSurge: 1`, Kubernetes can temporarily create one extra Pod while deploying the new version. The new Pod starts before an old Pod is terminated, which helps maintain application availability during the update.
+
+- **What does `maxUnavailable` do?**
+
+  `maxUnavailable` defines how many Pods are allowed to be unavailable (not ready) during the rollout.
+
+  With `maxUnavailable: 0`, Kubernetes ensures that no existing Pod is terminated until a new Pod is successfully created and marked as Ready.
+
+- **Why might you choose 0 for `maxUnavailable`?**
+
+  You choose `maxUnavailable: 0` to guarantee zero downtime deployments.
+
+  This ensures:
+  - The application always keeps the full number of available replicas
+  - No reduction in service capacity during the rollout
+  - Safer updates in production environments
+
+  This configuration is important when availability is critical and service interruption is not acceptable.
