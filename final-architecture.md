@@ -1,6 +1,6 @@
 # Current System Problems
 
-2.1 What is the problem?
+## 2.1 What is the problem?
 
 There is only one pod, so if the pod goes down the application will not be available until a new one is recreated.
 
